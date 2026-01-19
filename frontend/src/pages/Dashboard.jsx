@@ -26,8 +26,8 @@ const Dashboard = () => {
     try {
       const config = { headers: { Authorization: `Bearer ${token}` } };
       const url = isAdminOrSupport 
-        ? 'http://localhost:5000/api/complaints/all' 
-        : 'http://localhost:5000/api/complaints';
+        ? 'https://complaint-backend-cafm.onrender.com/api/complaints/all' 
+        : 'https://complaint-backend-cafm.onrender.com/api/complaints';
       const res = await axios.get(url, config);
       setComplaints(res.data);
       setLoading(false);
@@ -43,7 +43,7 @@ const Dashboard = () => {
     e.preventDefault();
     try {
       const config = { headers: { Authorization: `Bearer ${token}` } };
-      await axios.post('http://localhost:5000/api/complaints', formData, config);
+      await axios.post('https://complaint-backend-cafm.onrender.com/api/complaints', formData, config);
       toast.success('Complaint Registered!');
       setFormData({ title: '', description: '', category: 'Hardware', priority: 'Low' });
       fetchComplaints();
@@ -55,7 +55,7 @@ const Dashboard = () => {
   const handleStatusUpdate = async (id, newStatus) => {
     try {
       const config = { headers: { Authorization: `Bearer ${token}` } };
-      await axios.put(`http://localhost:5000/api/complaints/${id}`, { status: newStatus }, config);
+      await axios.put(`https://complaint-backend-cafm.onrender.com/api/complaints/${id}`, { status: newStatus }, config);
       toast.success(`Ticket marked as ${newStatus}`);
       fetchComplaints();
     } catch (err) {

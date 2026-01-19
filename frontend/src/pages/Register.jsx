@@ -21,7 +21,7 @@ const Register = () => {
     e.preventDefault();
 
     try {
-      const res = await axios.post('http://localhost:5000/api/auth/register', formData);
+      const res = await axios.post('https://complaint-backend-cafm.onrender.com/api/auth/register', formData);
       localStorage.setItem('user', JSON.stringify(res.data));
       toast.success('Registration Successful!');
       navigate('/dashboard');
