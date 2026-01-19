@@ -2,6 +2,7 @@ import { useEffect, useState } from 'react';
 import axios from 'axios';
 import { toast } from 'react-hot-toast';
 import Navbar from '../components/Navbar';
+import DashboardStats from '../components/DashboardStats';
 
 const Dashboard = () => {
   const [complaints, setComplaints] = useState([]);
@@ -15,8 +16,6 @@ const Dashboard = () => {
 
   const user = JSON.parse(localStorage.getItem('user'));
   const token = user?.token;
-
-  // Check if user is Admin or Support
   const isAdminOrSupport = user?.role === 'admin' || user?.role === 'support';
 
   useEffect(() => {
@@ -26,13 +25,9 @@ const Dashboard = () => {
   const fetchComplaints = async () => {
     try {
       const config = { headers: { Authorization: `Bearer ${token}` } };
-      
-      // If Admin, fetch ALL tickets. If Customer, fetch MY tickets.
-      // Note: We need to make sure the backend endpoint '/all' exists and is used for admins
       const url = isAdminOrSupport 
         ? 'http://localhost:5000/api/complaints/all' 
         : 'http://localhost:5000/api/complaints';
-
       const res = await axios.get(url, config);
       setComplaints(res.data);
       setLoading(false);
@@ -42,7 +37,6 @@ const Dashboard = () => {
     }
   };
 
-  // --- Handlers for Customers ---
   const onChange = (e) => setFormData({ ...formData, [e.target.name]: e.target.value });
   
   const onSubmit = async (e) => {
@@ -58,13 +52,12 @@ const Dashboard = () => {
     }
   };
 
-  // --- Handlers for Admin/Support ---
   const handleStatusUpdate = async (id, newStatus) => {
     try {
       const config = { headers: { Authorization: `Bearer ${token}` } };
       await axios.put(`http://localhost:5000/api/complaints/${id}`, { status: newStatus }, config);
       toast.success(`Ticket marked as ${newStatus}`);
-      fetchComplaints(); // Refresh to see changes
+      fetchComplaints();
     } catch (err) {
       toast.error('Update failed');
     }
@@ -74,18 +67,19 @@ const Dashboard = () => {
     <div className="min-h-screen bg-gray-50">
       <Navbar />
       <div className="max-w-7xl mx-auto py-10 px-4 sm:px-6 lg:px-8">
-        
-        {/* HEADER */}
         <div className="mb-8">
-            <h1 className="text-3xl font-bold text-gray-900">
-                {isAdminOrSupport ? 'Admin Dashboard' : 'My Dashboard'}
-            </h1>
-            <p className="text-gray-600">
-                {isAdminOrSupport ? 'Manage and resolve support tickets' : 'Track and manage your complaints'}
-            </p>
+          <h1 className="text-3xl font-bold text-gray-900">
+            {isAdminOrSupport ? 'Admin Dashboard' : 'My Dashboard'}
+          </h1>
+          <p className="text-gray-600">
+            {isAdminOrSupport ? 'Manage and resolve support tickets' : 'Track and manage your complaints'}
+          </p>
         </div>
 
-        {/* === CUSTOMER ONLY: CREATE TICKET FORM === */}
+        {isAdminOrSupport && complaints.length > 0 && (
+          <DashboardStats complaints={complaints} />
+        )}
+
         {!isAdminOrSupport && (
           <div className="bg-white p-6 rounded-lg shadow-md mb-10">
             <h2 className="text-2xl font-bold mb-4 text-gray-800">Raise a Complaint</h2>
@@ -115,63 +109,56 @@ const Dashboard = () => {
           </div>
         )}
 
-        {/* === SHARED: TICKET LIST === */}
         <div className="bg-white shadow overflow-hidden rounded-md">
           {loading ? <p className="p-4 text-center">Loading...</p> : (
             <ul className="divide-y divide-gray-200">
               {complaints.map((ticket) => (
                 <li key={ticket._id} className="p-4 hover:bg-gray-50 transition">
                   <div className="flex flex-col md:flex-row justify-between md:items-center">
-                    
-                    {/* Ticket Info */}
                     <div className="mb-4 md:mb-0">
                       <div className="flex items-center gap-2">
-                          <span className={`px-2 py-1 text-xs font-bold rounded uppercase ${
-                              ticket.priority === 'High' ? 'bg-red-100 text-red-800' : 'bg-blue-100 text-blue-800'
-                          }`}>
-                              {ticket.priority}
-                          </span>
-                          <h3 className="text-lg font-medium text-blue-600">#{ticket._id.slice(-6)} - {ticket.title}</h3>
+                        <span className={`px-2 py-1 text-xs font-bold rounded uppercase ${
+                          ticket.priority === 'High' ? 'bg-red-100 text-red-800' : 'bg-blue-100 text-blue-800'
+                        }`}>
+                          {ticket.priority}
+                        </span>
+                        <h3 className="text-lg font-medium text-blue-600">#{ticket._id.slice(-6)} - {ticket.title}</h3>
                       </div>
                       <p className="text-gray-600 mt-1">{ticket.description}</p>
                       <p className="text-xs text-gray-500 mt-2">
-                          Category: {ticket.category} • Status: <span className="font-bold">{ticket.status}</span>
+                        Category: {ticket.category} • Status: <span className="font-bold">{ticket.status}</span>
                       </p>
                     </div>
 
-                    {/* Admin Actions */}
                     {isAdminOrSupport && ticket.status !== 'Closed' && (
-                        <div className="flex gap-2">
-                            {ticket.status === 'Open' && (
-                                <button 
-                                    onClick={() => handleStatusUpdate(ticket._id, 'In Progress')}
-                                    className="px-3 py-1 bg-yellow-500 text-white text-sm rounded hover:bg-yellow-600">
-                                    Start Progress
-                                </button>
-                            )}
-                            <button 
-                                onClick={() => handleStatusUpdate(ticket._id, 'Closed')}
-                                className="px-3 py-1 bg-green-500 text-white text-sm rounded hover:bg-green-600">
-                                Close Ticket
-                            </button>
-                        </div>
+                      <div className="flex gap-2">
+                        {ticket.status === 'Open' && (
+                          <button 
+                            onClick={() => handleStatusUpdate(ticket._id, 'In Progress')}
+                            className="px-3 py-1 bg-yellow-500 text-white text-sm rounded hover:bg-yellow-600">
+                            Start Progress
+                          </button>
+                        )}
+                        <button 
+                          onClick={() => handleStatusUpdate(ticket._id, 'Closed')}
+                          className="px-3 py-1 bg-green-500 text-white text-sm rounded hover:bg-green-600">
+                          Close Ticket
+                        </button>
+                      </div>
                     )}
                     
-                    {/* Status Badge (if Closed or Customer View) */}
                     {(!isAdminOrSupport || ticket.status === 'Closed') && (
-                        <span className={`px-3 py-1 rounded-full text-sm font-semibold 
-                            ${ticket.status === 'Closed' ? 'bg-gray-200 text-gray-600' : 'bg-green-100 text-green-800'}`}>
-                            {ticket.status}
-                        </span>
+                      <span className={`px-3 py-1 rounded-full text-sm font-semibold 
+                        ${ticket.status === 'Closed' ? 'bg-gray-200 text-gray-600' : 'bg-green-100 text-green-800'}`}>
+                        {ticket.status}
+                      </span>
                     )}
-
                   </div>
                 </li>
               ))}
             </ul>
           )}
         </div>
-
       </div>
     </div>
   );
