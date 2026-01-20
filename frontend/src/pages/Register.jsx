@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import axios from 'axios';
 import { toast } from 'react-hot-toast';
 import { useNavigate, Link } from 'react-router-dom';
@@ -10,8 +10,15 @@ const Register = () => {
     password: '',
   });
   const [showPassword, setShowPassword] = useState(false);
+  const [isLoading, setIsLoading] = useState(false);
 
   const navigate = useNavigate();
+
+  useEffect(() => {
+    if (localStorage.getItem('user')) {
+      navigate('/dashboard');
+    }
+  }, [navigate]);
 
   const { name, email, password } = formData;
 
@@ -20,6 +27,7 @@ const Register = () => {
 
   const onSubmit = async (e) => {
     e.preventDefault();
+    setIsLoading(true);
 
     try {
       const res = await axios.post('https://complaint-backend-cafm.onrender.com/api/auth/register', formData);
@@ -28,6 +36,7 @@ const Register = () => {
       navigate('/dashboard');
     } catch (err) {
       toast.error(err.response?.data?.message || 'Registration Failed');
+      setIsLoading(false);
     }
   };
 
@@ -76,7 +85,7 @@ const Register = () => {
                 type="button"
                 onClick={() => setShowPassword(!showPassword)}
                 className="absolute right-3 top-3 text-gray-500 hover:text-gray-700 focus:outline-none"
-                title={showPassword ? "Hide password" : "Reveal password"}
+                title={showPassword ? "Hide Password" : "Show Password"}
               >
                 {showPassword ? (
                   <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor" className="w-5 h-5">
@@ -93,9 +102,10 @@ const Register = () => {
           </div>
           <button
             type="submit"
-            className="w-full px-4 py-2 text-white bg-blue-600 rounded-md hover:bg-blue-700 transition duration-200"
+            disabled={isLoading}
+            className={`w-full px-4 py-2 text-white rounded-md transition duration-200 ${isLoading ? 'bg-blue-400 cursor-not-allowed' : 'bg-blue-600 hover:bg-blue-700'}`}
           >
-            Register
+            {isLoading ? 'Creating Account...' : 'Register'}
           </button>
         </form>
         <p className="text-sm text-center text-gray-600">

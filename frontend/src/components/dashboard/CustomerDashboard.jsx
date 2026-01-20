@@ -5,6 +5,7 @@ import { toast } from 'react-hot-toast';
 const CustomerDashboard = () => {
   const [complaints, setComplaints] = useState([]);
   const [formData, setFormData] = useState({ title: '', description: '', category: 'Hardware', priority: 'Low' });
+  const [isSubmitting, setIsSubmitting] = useState(false);
   
   const token = JSON.parse(localStorage.getItem('user')).token;
   const config = { headers: { Authorization: `Bearer ${token}` } };
@@ -23,6 +24,7 @@ const CustomerDashboard = () => {
 
   const handleSubmit = async (e) => {
     e.preventDefault();
+    setIsSubmitting(true);
     try {
       await axios.post('https://complaint-backend-cafm.onrender.com/api/complaints', formData, config);
       toast.success('Ticket Created!');
@@ -31,6 +33,8 @@ const CustomerDashboard = () => {
       setComplaints(res.data);
     } catch (err) {
       toast.error('Failed to create ticket');
+    } finally {
+      setIsSubmitting(false);
     }
   };
 
@@ -66,8 +70,12 @@ const CustomerDashboard = () => {
                 </select>
             </div>
           </div>
-          <button type="submit" className="w-full bg-blue-600 text-white py-2 rounded hover:bg-blue-700">
-            Submit Ticket
+          <button 
+            type="submit" 
+            disabled={isSubmitting}
+            className={`w-full text-white py-2 rounded transition ${isSubmitting ? 'bg-blue-400 cursor-not-allowed' : 'bg-blue-600 hover:bg-blue-700'}`}
+          >
+            {isSubmitting ? 'Submitting...' : 'Submit Ticket'}
           </button>
         </form>
       </div>
