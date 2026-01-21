@@ -27,7 +27,7 @@ const DashboardStats = ({ complaints }) => {
       </div>
 
       {/* Chart */}
-      <div className="w-full md:w-1/2 h-64">
+      <div className="w-full md:w-1/2 h-64" role="region" aria-label="Ticket status distribution chart">
         <ResponsiveContainer width="100%" height="100%">
           <PieChart>
             <Pie
