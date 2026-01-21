@@ -3,7 +3,7 @@ import { PieChart, Pie, Cell, Tooltip, Legend, ResponsiveContainer } from 'recha
 const DashboardStats = ({ complaints }) => {
   // Calculate stats dynamically
   const total = complaints.length;
-  const closed = complaints.filter(c => c.status === 'Closed').length;
+  const closed = complaints.filter(c => c.status === 'Closed' || c.status === 'Resolved').length;
   const open = total - closed;
 
   const data = [
