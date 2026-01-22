@@ -14,16 +14,8 @@ const Login = () => {
   const navigate = useNavigate();
 
   useEffect(() => {
-    const user = localStorage.getItem('user');
-    if (user) {
-      try {
-        const parsedUser = JSON.parse(user);
-        if (parsedUser && parsedUser.token) {
-          navigate('/dashboard');
-        }
-      } catch (error) {
-        localStorage.removeItem('user');
-      }
+    if (localStorage.getItem('user')) {
+      navigate('/dashboard');
     }
   }, [navigate]);
 
