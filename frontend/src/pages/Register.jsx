@@ -15,8 +15,16 @@ const Register = () => {
   const navigate = useNavigate();
 
   useEffect(() => {
-    if (localStorage.getItem('user')) {
-      navigate('/dashboard');
+    const user = localStorage.getItem('user');
+    if (user) {
+      try {
+        const parsedUser = JSON.parse(user);
+        if (parsedUser && parsedUser.token) {
+          navigate('/dashboard');
+        }
+      } catch (error) {
+        localStorage.removeItem('user');
+      }
     }
   }, [navigate]);
 
