@@ -1,4 +1,5 @@
 import { useEffect, useState } from 'react';
+import { useNavigate } from 'react-router-dom';
 import Navbar from '../components/Navbar';
 import AdminDashboard from '../components/dashboard/AdminDashboard';
 import SupportDashboard from '../components/dashboard/SupportDashboard';
@@ -6,14 +7,19 @@ import CustomerDashboard from '../components/dashboard/CustomerDashboard';
 
 const Dashboard = () => {
   const [user, setUser] = useState(null);
+  const navigate = useNavigate();
 
   useEffect(() => {
     const loggedInUser = localStorage.getItem('user');
+    
     if (loggedInUser) {
       setUser(JSON.parse(loggedInUser));
+    } else {
+      navigate('/login');
     }
-  }, []);
+  }, [navigatenavigate]);
 
+  // This loading screen will now only show for a split second before redirecting
   if (!user) return <div className="p-10">Loading...</div>;
 
   return (
