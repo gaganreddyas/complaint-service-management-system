@@ -41,51 +41,58 @@ const Register = () => {
   };
 
   return (
-    <div className="flex items-center justify-center min-h-screen bg-gray-100">
-      <div className="w-full max-w-md p-8 space-y-6 bg-white rounded-lg shadow-md">
-        <h2 className="text-3xl font-bold text-center text-gray-900">Register</h2>
-        <form className="space-y-4" onSubmit={onSubmit}>
-           <div>
-            <label className="block text-sm font-medium text-gray-700">Full Name</label>
+    <div className="min-h-screen flex flex-col items-center justify-center bg-gray-50">
+      <div className="bg-white p-8 rounded-lg shadow-md w-96">
+        
+        {/* === BRANDING HEADER === */}
+        <div className="text-center mb-6">
+          <h1 className="text-3xl font-extrabold text-blue-600 tracking-wider">ServiceDesk</h1>
+          <p className="text-sm text-gray-500 mt-1">Create your workspace</p>
+        </div>
+
+        <h2 className="text-xl font-semibold mb-6 text-center text-gray-700">Register</h2>
+        
+        <form onSubmit={onSubmit} className="space-y-4">
+          <div>
+            <label className="block text-gray-700 text-sm font-medium mb-1">Full Name</label>
             <input
               type="text"
               name="name"
-              value={name}
+              value={formData.name}
               onChange={onChange}
               required
-              className="w-full px-3 py-2 mt-1 border rounded-md focus:ring-blue-500 focus:border-blue-500"
+              className="w-full p-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
               placeholder="John Doe"
             />
           </div>
           <div>
-            <label className="block text-sm font-medium text-gray-700">Email</label>
+            <label className="block text-gray-700 text-sm font-medium mb-1">Email</label>
             <input
               type="email"
               name="email"
-              value={email}
+              value={formData.email}
               onChange={onChange}
               required
-              className="w-full px-3 py-2 mt-1 border rounded-md focus:ring-blue-500 focus:border-blue-500"
+              className="w-full p-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
               placeholder="john@example.com"
             />
           </div>
           <div>
-            <label className="block text-sm font-medium text-gray-700">Password</label>
+            <label className="block text-gray-700 text-sm font-medium mb-1">Password</label>
             <div className="relative">
               <input
                 type={showPassword ? "text" : "password"}
                 name="password"
-                value={password}
+                value={formData.password}
                 onChange={onChange}
                 required
-                className="w-full px-3 py-2 mt-1 border rounded-md focus:ring-blue-500 focus:border-blue-500 pr-10"
+                className="w-full p-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 pr-10"
                 placeholder="••••••••"
               />
               <button
                 type="button"
                 onClick={() => setShowPassword(!showPassword)}
-                className="absolute right-3 top-3 text-gray-500 hover:text-gray-700 focus:outline-none"
-                title={showPassword ? "Hide Password" : "Show Password"}
+                className="absolute right-3 top-2.5 text-gray-400 hover:text-gray-600 focus:outline-none"
               >
                 {showPassword ? (
                   <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor" className="w-5 h-5">
@@ -103,18 +110,21 @@ const Register = () => {
           <button
             type="submit"
             disabled={isLoading}
-            className={`w-full px-4 py-2 text-white rounded-md transition duration-200 ${isLoading ? 'bg-blue-400 cursor-not-allowed' : 'bg-blue-600 hover:bg-blue-700'}`}
+            className={`w-full text-white py-2 rounded-md font-semibold transition duration-200 ${isLoading ? 'bg-blue-400 cursor-not-allowed' : 'bg-blue-600 hover:bg-blue-700 shadow-md hover:shadow-lg'}`}
           >
             {isLoading ? 'Creating Account...' : 'Register'}
           </button>
         </form>
-        <p className="text-sm text-center text-gray-600">
-          Already have an account?{' '}
-          <Link to="/login" className="font-medium text-blue-600 hover:text-blue-500">
-            Login here
-          </Link>
-        </p>
+
+        <div className="mt-6 text-center border-t pt-4">
+          <p className="text-sm text-gray-600">
+            Already have an account? <Link to="/login" className="text-blue-600 font-semibold hover:underline">Login</Link>
+          </p>
+        </div>
       </div>
+      
+      {/* Footer Branding */}
+      <p className="mt-8 text-xs text-gray-400">© 2026 ServiceDesk Corp.</p>
     </div>
   );
 };
