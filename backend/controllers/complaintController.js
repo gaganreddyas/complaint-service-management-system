@@ -102,10 +102,18 @@ const updateComplaint = async (req, res) => {
   }
 
   // --- AUTHORIZATION CHECKS ---
-  // 1. Customer cannot update anything except maybe 'Closed' (simplified here: Customer blocked)
+  // 1. Customer can only close their own tickets if status is 'Resolved'
   if (req.user.role === 'customer') {
-    res.status(401);
-    throw new Error('Customers cannot update tickets directly. Contact support.');
+    // Check if this is their ticket
+    if (complaint.user.toString() !== req.user.id) {
+      res.status(401);
+      throw new Error('Not Authorized');
+    }
+    // Allow only closing resolved tickets
+    if (req.body.status !== 'Closed' || complaint.status !== 'Resolved') {
+      res.status(401);
+      throw new Error('You can only close resolved tickets');
+    }
   }
 
   // 2. Support can only update tickets assigned to them (unless they are grabbing a new one)
