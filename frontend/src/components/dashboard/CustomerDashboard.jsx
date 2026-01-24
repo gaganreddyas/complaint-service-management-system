@@ -13,7 +13,7 @@ const CustomerDashboard = () => {
   useEffect(() => {
     const fetchMyTickets = async () => {
       try {
-        const res = await axios.get('https://complaint-backend-cafm.onrender.com/api/complaints', config);
+        const res = await axios.get('http://localhost:5000/api/complaints', config);
         setComplaints(res.data);
       } catch (err) {
         console.error(err);
@@ -26,15 +26,31 @@ const CustomerDashboard = () => {
     e.preventDefault();
     setIsSubmitting(true);
     try {
-      await axios.post('https://complaint-backend-cafm.onrender.com/api/complaints', formData, config);
+      await axios.post('http://localhost:5000/api/complaints', formData, config);
       toast.success('Ticket Created!');
       setFormData({ title: '', description: '', category: 'Hardware', priority: 'Low' });
-      const res = await axios.get('https://complaint-backend-cafm.onrender.com/api/complaints', config);
+      const res = await axios.get('http://localhost:5000/api/complaints', config);
       setComplaints(res.data);
     } catch (err) {
       toast.error('Failed to create ticket');
     } finally {
       setIsSubmitting(false);
+    }
+  };
+
+  // --- NEW FUNCTION: CLOSE TICKET ---
+  const closeTicket = async (id) => {
+    if(!window.confirm("Are you sure you want to close this ticket? This means your issue is resolved.")) return;
+
+    try {
+        await axios.put(`http://localhost:5000/api/complaints/${id}`, { status: 'Closed' }, config);
+        toast.success('Ticket Closed Successfully');
+        // Update UI locally
+        setComplaints(complaints.map(ticket => 
+            ticket._id === id ? { ...ticket, status: 'Closed' } : ticket
+        ));
+    } catch (err) {
+        toast.error('Failed to close ticket');
     }
   };
 
@@ -84,18 +100,44 @@ const CustomerDashboard = () => {
         <h2 className="text-xl font-bold mb-4">My History</h2>
         <div className="space-y-4">
           {complaints.map((ticket) => (
-            <div key={ticket._id} className="bg-white p-4 rounded shadow flex justify-between items-center">
+            <div key={ticket._id} className="bg-white p-4 rounded shadow flex justify-between items-center border-l-4 border-blue-500">
               <div>
                 <h3 className="font-bold text-gray-800">{ticket.title}</h3>
-                <p className="text-sm text-gray-500">Status: <span className="font-semibold text-blue-600">{ticket.status}</span></p>
+                <div className="flex items-center gap-2 mt-1">
+                    <span className={`text-xs px-2 py-0.5 rounded text-white ${
+                        ticket.status === 'Open' ? 'bg-blue-500' :
+                        ticket.status === 'In Progress' ? 'bg-yellow-500' :
+                        ticket.status === 'Resolved' ? 'bg-green-500' : 'bg-gray-500'
+                    }`}>
+                        {ticket.status}
+                    </span>
+                    <span className="text-xs text-gray-500">
+                        {new Date(ticket.createdAt).toLocaleDateString()}
+                    </span>
+                </div>
               </div>
+
               <div className="text-right">
-                <span className="text-xs bg-gray-100 px-2 py-1 rounded">
-                    {new Date(ticket.createdAt).toLocaleDateString()}
-                </span>
+                {/* --- NEW BUTTON LOGIC --- */}
+                {ticket.status === 'Resolved' && (
+                    <button 
+                        onClick={() => closeTicket(ticket._id)}
+                        className="bg-gray-800 text-white text-xs px-3 py-1.5 rounded hover:bg-gray-900 transition"
+                    >
+                        Mark as Closed 🔒
+                    </button>
+                )}
+                
+                {ticket.status === 'Closed' && (
+                    <span className="text-gray-400 text-sm font-medium">Closed</span>
+                )}
               </div>
             </div>
           ))}
+          
+          {complaints.length === 0 && (
+             <p className="text-gray-500 text-center py-4">No tickets found.</p>
+          )}
         </div>
       </div>
 
