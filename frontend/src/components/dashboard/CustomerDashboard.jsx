@@ -13,7 +13,7 @@ const CustomerDashboard = () => {
   useEffect(() => {
     const fetchMyTickets = async () => {
       try {
-        const res = await axios.get('http://localhost:5000/api/complaints', config);
+        const res = await axios.get('https://complaint-backend-cafm.onrender.com/api/complaints', config);
         setComplaints(res.data);
       } catch (err) {
         console.error(err);
@@ -26,10 +26,10 @@ const CustomerDashboard = () => {
     e.preventDefault();
     setIsSubmitting(true);
     try {
-      await axios.post('http://localhost:5000/api/complaints', formData, config);
+      await axios.post('https://complaint-backend-cafm.onrender.com/api/complaints', formData, config);
       toast.success('Ticket Created!');
       setFormData({ title: '', description: '', category: 'Hardware', priority: 'Low' });
-      const res = await axios.get('http://localhost:5000/api/complaints', config);
+      const res = await axios.get('https://complaint-backend-cafm.onrender.com/api/complaints', config);
       setComplaints(res.data);
     } catch (err) {
       toast.error('Failed to create ticket');
@@ -43,7 +43,7 @@ const CustomerDashboard = () => {
     if(!window.confirm("Are you sure you want to close this ticket? This means your issue is resolved.")) return;
 
     try {
-        await axios.put(`http://localhost:5000/api/complaints/${id}`, { status: 'Closed' }, config);
+        await axios.put(`https://complaint-backend-cafm.onrender.com/api/complaints/${id}`, { status: 'Closed' }, config);
         toast.success('Ticket Closed Successfully');
         // Update UI locally
         setComplaints(complaints.map(ticket => 
